@@ -21,21 +21,37 @@
         _ (log/debug to-user-name)
         from-user-name (first (:content (first (filter #(= (:tag %) :FromUserName) (:content body)))))
         _ (log/debug from-user-name)
-        content (first (:content (first (filter #(= (:tag %) :Content) (:content body)))))
+        content (clojure.string/lower-case (first (:content (first (filter #(= (:tag %) :Content) (:content body))))))
         _ (log/debug content)
-        _ (log/debug (env :data-path))
+        data-path (env :data-path)
+        _ (log/debug data-path)
+        summary-path (env :summary-path)
         _ (log/debug (utils/get-today-date))
-        _ (log/debug (utils/read-data (env :data-path)
-                                      (utils/get-today-date)))
-        re-content (if (= content "data")
-                     (let [today-data (utils/read-data (env :data-path)
-                                                       (utils/get-today-date))
-                           yesterday-data (utils/read-data (env :data-path)
-                                                           (utils/get-yesterday-date))]
-                       (if-not (nil? today-data)
-                         today-data
-                         yesterday-data))
-                     content)
+        get-dt (fn [content which]
+                 (let [content-length (.length content)
+                       which-length (.length which)]
+                   (if (= content-length which-length)
+                     (utils/get-today-date)
+                     (.substring content (inc which-length)))))
+        re-content (cond
+                     (.startsWith content "hs300") (utils/format-hs300 (utils/read-hs300 data-path
+                                                                                         (get-dt content "hs300")))
+                     (.startsWith content "all") (utils/format-summary (utils/read-summary summary-path
+                                                                                           (get-dt content "all")
+                                                                                           "all"))
+                     (.startsWith content "afternoon") (utils/format-summary (utils/read-summary summary-path
+                                                                                                 (get-dt content "afternoon")
+                                                                                                 "afternoon"))
+                     (.startsWith content "amount-10") (utils/format-summary (utils/read-summary summary-path
+                                                                                                 (get-dt content "amount-10")
+                                                                                                 "amount-10"))
+                     (.startsWith content "volume-400") (utils/format-summary (utils/read-summary summary-path
+                                                                                                  (get-dt content "volume-400")
+                                                                                                  "volume-400"))
+                     (.startsWith content "top") (utils/format-summary (utils/read-summary summary-path
+                                                                                           (get-dt content "top")
+                                                                                           "all.top-trans-amount"))
+                     :else content)
         re-xml (xml/emit-str (xml/element :xml {}
                                           (xml/element :ToUserName {} (xml/cdata from-user-name))
                                           (xml/element :FromUserName {} (xml/cdata to-user-name))
