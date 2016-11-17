@@ -1,5 +1,6 @@
 (ns market-analysis.utils
-  (:require [clojure.data.csv :as csv]))
+  (:require [clojure.data.csv :as csv]
+            [postal.core :as postal]))
 
 (defn read-data [path dt]
   (let [file (clojure.java.io/file (str path "/data." dt))]
@@ -63,21 +64,23 @@
                                       :big-normal-trans-amount big-normal-trans-amount
                                       :count count})))))))
 
-(defn read-hs300 [path dt]
-  (let [hs300-csv (str path "/SH000300." dt)
-        hs300-data (read-csv hs300-csv)
-        header (map keyword (first hs300-data))
-        data (second hs300-data)]
-    (loop [hd header
-           index 0
-           hs300 {}]
-      (if (empty? hd)
-        hs300
-        (recur (rest hd)
-               (inc index)
-               (assoc hs300
-                      (first hd)
-                      (nth data index)))))))
+(defn read-hs300
+  ([hs300-csv]
+   (let [hs300-data (read-csv hs300-csv)
+         header (map keyword (first hs300-data))
+         data (second hs300-data)]
+     (loop [hd header
+            index 0
+            hs300 {}]
+       (if (empty? hd)
+         hs300
+         (recur (rest hd)
+                (inc index)
+                (assoc hs300
+                       (first hd)
+                       (nth data index)))))))
+  ([path dt]
+   (read-hs300 (str path "/SH000300." dt))))
 
 (defn get-today-date
   []
@@ -131,3 +134,13 @@
        "volume: " (:volume hs300) "\n"
        "high: " (:high hs300) "\n"
        "low: " (:low hs300) "\n"))
+
+(defn send-mail [message]
+  (postal/send-message {:host "smtp.qq.com"
+                        :user "309456568@qq.com"
+                        :pass "bhfnzsvanysgcaei"
+                        :ssl true}
+                       {:from "309456568@qq.com"
+                        :to ["309456568@qq.com"]
+                        :subject "daily summary"
+                        :body message}))

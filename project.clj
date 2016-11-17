@@ -24,7 +24,9 @@
                  [org.webjars/webjars-locator-jboss-vfs "0.1.0"]
                  [luminus-immutant "0.2.2"]
                  [org.clojure/data.xml "0.0.8"]
-                 [org.clojure/data.csv "0.1.3"]]
+                 [org.clojure/data.csv "0.1.3"]
+                 [com.draines/postal "2.0.2"]
+                 [com.jd.bdp.magpie/magpie-utils "0.1.4-SNAPSHOT"]]
 
   :min-lein-version "2.0.0"
 
