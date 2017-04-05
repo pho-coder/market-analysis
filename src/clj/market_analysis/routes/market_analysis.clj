@@ -39,6 +39,9 @@
                      (.startsWith content "all") (utils/format-summary (utils/read-summary summary-path
                                                                                            (get-dt content "all")
                                                                                            "all"))
+                     (.startsWith content "morning") (utils/format-summary (utils/read-summary summary-path
+                                                                                              (get-dt content "morning")
+                                                                                              "morning"))
                      (.startsWith content "afternoon") (utils/format-summary (utils/read-summary summary-path
                                                                                                  (get-dt content "afternoon")
                                                                                                  "afternoon"))
