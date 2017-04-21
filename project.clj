@@ -1,4 +1,4 @@
-(defproject market-analysis "0.1.1-SNAPSHOT"
+(defproject market-analysis "0.1.2-SNAPSHOT"
 
   :description "analysis stock market by data"
   :url "http://example.com/FIXME"

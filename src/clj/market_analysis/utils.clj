@@ -108,7 +108,9 @@
                                   (let [one-key (first d-keys)
                                         one-data (one-key data)]
                                     (recur (rest d-keys)
-                                           (str re-str (name one-key) ": " one-data "\n")))))]
+                                           (if (= one-key :count)
+                                             (str re-str (name one-key) ": " one-data "\n")
+                                             (str re-str (name one-key) ": " (with-precision 3 (/ (bigdec one-data) 100000000)) "亿\n"))))))]
           (recur (rest ts)
                  (str re-str (name typ) ":\n" sorted-data-str)))))))
 
